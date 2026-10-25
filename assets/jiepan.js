@@ -527,6 +527,143 @@
       + '</li>';
   }
 
+
+  // ---------- 趣味AI解读（模板库） ----------
+  // 每条提示词都用本盘真实数据填好，不留 [占位符]；密钥不进页面，只做复制与跳转。
+  const AI_STYLES = [
+    {
+      key: 'shuangwen', name: '爽文小说版', tag: '先立这个人，再起冲突，不靠打脸',
+      say: '写成一个短篇，主角是求测人本人。',
+      body: [
+        '你是一位擅长短篇爽文的作者。按下面这张奇门盘的「气」写一个人的处境，不要写成算命，也不要写成鸡汤。',
+        '【写作铁律】',
+        '1. 先立人格底色：这个人是什么样的人、惯常怎么做事、别人怎么看他——用具体行为与细节写，不用形容词堆。底色要在前三分之一写完。',
+        '2. 冲突第二：困境来自性格与环境的咬合，不是来自反派。可以有人使绊子，但那只是外因。',
+        '3. 不强制打脸：允许主角不反击、绕开、或者赢了却觉得没意思。爽感来自「看清了、选了、承担了」，不是来自羞辱对手。',
+        '4. 盘上的每一处吉凶，都要变成情节里的一次具体选择，不要出现「命盘说」「格局显示」这种字眼。',
+        '5. 结尾落到一个动作或一句话，不总结道理。'
+      ],
+      out: '篇幅 700–900 字，第二人称或第三人称皆可，纯叙事，不要小标题。'
+    },
+    {
+      key: 'shuoshu', name: '说书先生版', tag: '茶馆评书腔，惊堂木一响，留个扣子',
+      say: '写成一段茶馆评书，说给满堂的人听。',
+      body: [
+        '你是一位说书先生，在茶馆里说今人的故事。用评书腔：惊堂木、醒木、扣子、且听下回分解。',
+        '【写作铁律】',
+        '1. 开场先拍一记惊堂木，一句话把这一局的气象抖出来。',
+        '2. 中段把盘上的门、星、神说成人物与场面：门是走的路，星是来的人，神是暗处的力。',
+        '3. 该有的一句「看官须知」，把这一局的关口点破。',
+        '4. 结尾留扣子，「要知后事如何，且听下回分解」，但不许凭空编下一回的吉凶。',
+        '5. 全程口语，有节奏，句子短，可以押韵，不要书面腔。'
+      ],
+      out: '篇幅 400–600 字，一口气说完的段落感，不要小标题。'
+    },
+    {
+      key: 'chongsheng', name: '重生归来版', tag: '上一世错在哪，这一世怎么破',
+      say: '写成重生文的第一章：上一世的因，这一世的破局。',
+      body: [
+        '你写重生文。同一个人，上一世按这张盘的旧路走，吃尽了亏；这一世他记得，改走另一条。',
+        '【写作铁律】',
+        '1. 先写上一世的因：某一处选择、某一句话没忍住、某一次信错了人——要具体，要能对上盘上的忌处。',
+        '2. 再写这一世的破局：同一个局面再来一次，他如何避开、如何改口、如何把凶处化成缓冲。破局靠的是「不重复」，不是靠外挂。',
+        '3. 不写系统面板、不写金手指、不写数值。',
+        '4. 结尾停在破局那一刻的感受，不写成败结论。'
+      ],
+      out: '篇幅 700–900 字，两世对照清晰，不要小标题，不要「前世/今生」这类分节标签。'
+    },
+    {
+      key: 'panci', name: '一句判词版', tag: '七个字断语，一句话说清为什么',
+      say: '写成一句判词，加一行解释。',
+      body: [
+        '你是一位写判词的人，只写两行。',
+        '【写作铁律】',
+        '1. 第一行：七个字以内的判词，要有画面、有动作，不要成语堆砌，不要吉凶二字。',
+        '2. 第二行：一句话说明为什么——点出盘上真正决定胜负的那一处（哪一宫、哪一门、哪一处受制），说人话。',
+        '3. 不要建议清单，不要安慰，不要「加油」。',
+        '4. 允冷、允狠、允留白。'
+      ],
+      out: '总共不超过 60 字。'
+    }
+  ];
+
+  function aiFacts(r, a) {
+    const dGan = r.dP.gan, dP = palaceOf.gan(r, dGan) || r.zhiFuPalace;
+    const hGan = r.hP.gan, hP = palaceOf.gan(r, hGan);
+    const pd = p => {
+      const i = r.palaces[p] || {};
+      return P_NAME[p] + '（' + P_DIR[p] + '）临 ' + (i.tianXing || '—') + '·' + (i.men || '—') + '·' + (i.shen || '—')
+        + '，天盘' + (i.tianGan || '—') + ' 地盘' + (i.diGan || '—');
+    };
+    const lines = [];
+    lines.push('起局：' + (r.mP ? r.mP.zhi + '月' : '—') + '，' + (r.dP ? r.dP.zhi + '日' : '') + '，日干 ' + dGan + '，时干 ' + hGan);
+    lines.push('日干宫（求测人）：' + pd(dP));
+    if (hP) lines.push('时干宫（所问之事）：' + pd(hP));
+    const lh = palaceOf.shen(r, '六合'); if (lh) lines.push('六合宫（和合、中介）：' + pd(lh));
+    const yi = palaceOf.gan(r, '乙'), geng = palaceOf.gan(r, '庚');
+    if (yi) lines.push('乙宫（女）：' + pd(yi));
+    if (geng) lines.push('庚宫（男）：' + pd(geng));
+    [['生门', '财'], ['休门', '养'], ['开门', '事'], ['杜门', '闭']].forEach(function (t) {
+      const p = palaceOf.men(r, t[0]);
+      if (p) lines.push(t[0] + '（' + t[1] + '）落宫：' + pd(p));
+    });
+    const H = [];
+    [dP, hP, lh, yi, geng].forEach(function (p) {
+      if (!p) return;
+      harmsOf(r, p).forEach(function (h) { H.push(P_NAME[p] + ' ' + h.k + '（' + h.why + '）'); });
+    });
+    lines.push('四害：' + (H.length ? H.join('；') : '无（本盘用神诸宫未见击刑、入墓、门迫、空亡）'));
+    lines.push('本局克应：' + (a.ge && a.ge.length
+      ? a.ge.map(function (g) { return g.name + '（' + P_NAME[g.p] + '）'; }).join('、')
+      : '未见成对格局'));
+    lines.push('所问：' + a.q.label + '；用神 ' + a.yong.name + ' 落 ' + P_NAME[a.yong.p] + '；本盘判 ' + a.verdict
+      + '（助 ' + a.tally.help + ' · 忌 ' + a.tally.harm + ' · 平 ' + a.tally.flat + '）');
+    return lines.join('\n');
+  }
+
+  function aiPrompt(r, a, st) {
+    return [
+      st.body[0],
+      '',
+      st.say,
+      '',
+      '【本盘数据 · 已按此局填好，直接使用】',
+      aiFacts(r, a),
+      '',
+      st.body.slice(1).join('\n'),
+      '',
+      '【输出】' + st.out,
+      '',
+      '【红线】盘上的吉凶只能落到具体的人、事、选择上；不要断具体日期，不要许诺结果，不要写医疗判断（涉及健康一律建议就医）；不要出现「仅供娱乐」以外的免责声明。全文最后一行写：仅供娱乐，不作决策依据。'
+    ].join('\n');
+  }
+
+  function copyText(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+    return new Promise(function (res, rej) {
+      const ta = document.createElement('textarea');
+      ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy') ? res() : rej(new Error('copy failed')); } catch (e) { rej(e); }
+      document.body.removeChild(ta);
+    });
+  }
+
+  function aiSection(r, a) {
+    const cards = AI_STYLES.map(function (st) {
+      return '<div class="jp-ai-card" data-style="' + st.key + '">'
+        + '<div class="jp-ai-head"><b>' + st.name + '</b><em>' + st.tag + '</em></div>'
+        + '<div class="jp-ai-act">'
+        + '<button class="jp-ai-copy" data-style="' + st.key + '">复制提示词</button>'
+        + '<button class="jp-ai-go" data-style="' + st.key + '">丢给 ChatGPT ↗</button>'
+        + '</div></div>';
+    }).join('');
+    return '<div class="jp-sect jp-ai"><h4>趣味AI解读</h4>'
+      + '<p class="jp-ai-note">同一张盘，换一副嗓子讲。四条提示词都已用你这盘的真实数据填好，宫、星、门、神、四害都在里面。</p>'
+      + '<div class="jp-ai-grid">' + cards + '</div>'
+      + '<p class="jp-ai-fine"><span>盘面结论只在本页；</span><span>故事的吉凶是文学，不是断语。</span><span>仅供娱乐。</span><span>健康问题请就医。</span></p></div>';
+  }
+
   function render(container, r, qKey, opts) {
     opts = opts || {};
     if (!r) { container.innerHTML = '<div class="jp-empty">先排一局，再看解盘。</div>'; return; }
@@ -580,6 +717,8 @@
 
       + '<div class="jp-sect"><h4>这一局怎么读出来 · 六步</h4><div class="jp-steps" id="jp-steps"></div></div>'
 
+      + aiSection(r, a)
+
       + '<div class="jp-foot">'
       + '<span class="jp-legend"><i class="pos"></i>助 <i class="neg"></i>忌 <i class="neu"></i>平</span>'
       + '体系：时家转盘 · 拆补法定局；十干克应取张志春《神奇之门》所列成对格局，只收各派一致者。'
@@ -602,6 +741,32 @@
     });
     container.querySelectorAll('.jp-goto').forEach(function (b) {
       b.addEventListener('click', function () { if (opts.onGoto) opts.onGoto(parseInt(b.dataset.palace, 10)); });
+    });
+
+    // 趣味AI解读：复制 / 跳转（密钥永不进页面）
+    const byKey = {};
+    AI_STYLES.forEach(function (st) { byKey[st.key] = st; });
+    container.querySelectorAll('.jp-ai-copy').forEach(function (b) {
+      b.addEventListener('click', function () {
+        const st = byKey[b.dataset.style];
+        const txt = aiPrompt(r, a, st);
+        const done = function () { b.classList.add('done'); b.textContent = '已复制'; setTimeout(function () { b.classList.remove('done'); b.textContent = '复制提示词'; }, 1800); };
+        copyText(txt).then(done).catch(function () { b.textContent = '复制失败，长按选取'; });
+      });
+    });
+    container.querySelectorAll('.jp-ai-go').forEach(function (b) {
+      b.addEventListener('click', function () {
+        const st = byKey[b.dataset.style];
+        const txt = aiPrompt(r, a, st);
+        const url = 'https://chatgpt.com/?q=' + encodeURIComponent(txt);
+        if (url.length > 7500) {
+          copyText(txt);
+          window.open('https://chatgpt.com/', '_blank', 'noopener');
+          b.textContent = '已复制，粘贴过去';
+          return;
+        }
+        window.open(url, '_blank', 'noopener');
+      });
     });
   }
 

@@ -654,6 +654,22 @@ body{overflow-x:clip;}
 .jp-legend i.pos{background:#3E7C5C;}
 .jp-legend i.neg{background:#B23A2E;}
 .jp-legend i.neu{background:var(--line);margin-left:6px;}
+/* ---- 趣味AI解读 ---- */
+.jp-ai-note{margin:0 0 14px;font-size:12.5px;line-height:1.8;color:var(--ink);opacity:.82;}
+.jp-ai-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+@media (min-width:600px){.jp-ai-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}}
+.jp-ai-card{display:flex;flex-direction:column;gap:12px;padding:18px 17px 16px;border:1px solid rgba(166,124,46,.24);border-radius:14px;background:rgba(255,255,255,.6);}
+.jp-ai-head b{display:block;font-size:16.5px;letter-spacing:1.2px;color:var(--ink);line-height:1.3;}
+.jp-ai-head em{display:block;margin-top:7px;font-style:normal;font-size:12.5px;line-height:1.7;color:var(--ink);opacity:.86;}
+.jp-ai-act{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:2px;}
+.jp-ai-act button{font-family:inherit;cursor:pointer;border-radius:9px;transition:background .18s,border-color .18s,color .18s;}
+.jp-ai-copy{min-height:40px;padding:0 16px;border:1px solid rgba(166,124,46,.42);background:transparent;color:var(--zhu);font-size:12.5px;letter-spacing:.6px;}
+.jp-ai-copy:hover{background:rgba(166,124,46,.09);}
+.jp-ai-copy.done{border-color:var(--zhu);background:var(--zhu);color:#fff;}
+.jp-ai-go{min-height:40px;padding:0;border:0;background:none;color:var(--zhu);font-size:12.5px;letter-spacing:.4px;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:rgba(166,124,46,.45);}
+.jp-ai-fine{margin:14px 0 0;font-size:11.5px;line-height:1.9;color:var(--ink);opacity:.66;}
+.jp-ai-fine span{display:inline-block;}
+@media (max-width:520px){.jp-ai-act{gap:10px;}.jp-ai-copy{min-height:44px;flex:1 1 auto;text-align:center;}.jp-ai-go{min-height:44px;}}
 .jp-foot{margin:22px 0 8px;font-size:11.5px;color:var(--ink-soft);line-height:1.7;
   border-top:1px dashed var(--line);padding-top:10px;}
 .jp-empty{padding:26px 4px;font-size:13px;color:var(--ink-soft);text-align:center;}
