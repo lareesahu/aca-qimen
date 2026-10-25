@@ -1,0 +1,17 @@
+{
+  "name": "鼠鼠阿仓奇门排盘",
+  "short_name": "阿仓奇门",
+  "description": "时家转盘 · 拆补法定局。奇门遁甲九宫排盘，本地计算。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3ECDD",
+  "theme_color": "#A63D2F",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "./assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
