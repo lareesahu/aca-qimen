@@ -572,6 +572,14 @@ body{overflow-x:clip;}
 </style>
 
 <style>
+/* ===== 页脚归属 ===== */
+.site-foot{margin:34px 0 6px;padding:16px 0 calc(6px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);text-align:center;}
+.site-foot p{margin:0;line-height:1.7;}
+.sf-own{font-size:12.5px;letter-spacing:1.5px;color:#6B5B47;}
+.sf-own b{color:var(--ink);font-weight:700;letter-spacing:2px;}
+.sf-meta{font-size:11px;color:#8A7C68;letter-spacing:.5px;margin-top:3px;}
+
 /* ===== 解盘 ===== */
 .jp-head{padding:16px 0 6px;}
 .jp-head h2{font-size:20px;letter-spacing:4px;color:var(--ink);margin:0 0 6px;}
@@ -582,7 +590,7 @@ body{overflow-x:clip;}
   background:rgba(255,255,255,.45);color:var(--ink-soft);border-radius:999px;cursor:pointer;transition:.18s;}
 .jp-q:hover{color:var(--ink);border-color:var(--gold);}
 .jp-q{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:500;}
-.jp-q .jp-tick{font-size:11px;width:11px;display:inline-block;color:var(--zhu);opacity:0;}
+.jp-q .jp-tick{font-size:11px;flex:0 0 12px;width:12px;text-align:center;display:inline-block;color:var(--zhu);opacity:0;}
 .jp-q.on{background:rgba(166,61,47,.08);border-color:#A63D2F;color:#8E2B22;font-weight:700;}
 .jp-q.on .jp-tick{opacity:1;}
 .jp-verdict{border-radius:12px;padding:18px 20px 16px;border:1.5px solid var(--line);background:rgba(255,255,255,.62);box-shadow:0 1px 0 rgba(0,0,0,.02);}
@@ -649,6 +657,32 @@ body{overflow-x:clip;}
 .jp-foot{margin:22px 0 8px;font-size:11.5px;color:var(--ink-soft);line-height:1.7;
   border-top:1px dashed var(--line);padding-top:10px;}
 .jp-empty{padding:26px 4px;font-size:13px;color:var(--ink-soft);text-align:center;}
+.jp-v-side b.good{color:#2F6349;}
+.jp-v-side b.bad{color:#8E2B22;}
+.jp-logic{margin:12px 0 0;padding:12px 14px;border-radius:8px;background:rgba(243,236,221,.55);
+  border:1px solid var(--line);font-size:13px;line-height:1.85;color:var(--ink);}
+.jp-logic b{display:block;color:var(--zhu);letter-spacing:1px;margin-bottom:3px;}
+.jp-logic p{margin:0;}
+.jp-count{display:inline-block;margin-bottom:4px;font-size:11.5px;letter-spacing:1px;color:#8A6A4E;
+  background:rgba(166,124,46,.12);border-radius:999px;padding:2px 9px;}
+.jp-crits{list-style:none;margin:0;padding:0;display:grid;gap:8px;}
+.jp-crits-extra{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);}
+.jp-crit{padding:11px 13px;border-radius:8px;background:rgba(255,255,255,.44);
+  border:1px solid var(--line);border-left:3px solid var(--line);font-size:13px;line-height:1.75;}
+.jp-crit.pos{border-left-color:#3E7C5C;}
+.jp-crit.neg{border-left-color:#B23A2E;}
+.jp-c-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:3px;}
+.jp-c-head b{font-size:12.5px;letter-spacing:1px;color:var(--ink-soft);font-weight:600;}
+.jp-c-data{color:var(--ink);}
+.jp-c-why{color:#6B5B47;margin-top:3px;}
+.jp-ge{list-style:none;margin:0;padding:0;display:grid;gap:7px;}
+.jp-ge li{padding:10px 13px;border-radius:8px;background:rgba(255,255,255,.44);
+  border:1px solid var(--line);border-left:3px solid var(--line);font-size:13px;line-height:1.7;}
+.jp-ge li.pos{border-left-color:#3E7C5C;}
+.jp-ge li.neg{border-left-color:#B23A2E;}
+.jp-ge b{letter-spacing:1px;}
+.jp-ge span{color:var(--ink-soft);font-size:12px;margin-left:8px;}
+.jp-ge em{display:block;font-style:normal;color:#6B5B47;margin-top:3px;}
 @media (max-width:560px){
   .jp-qs{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .jp-q{width:100%;text-align:center;}
@@ -656,6 +690,8 @@ body{overflow-x:clip;}
   .jp-row{grid-template-columns:1fr;gap:3px;}
   .jp-why{grid-column:1;}
   .jp-q{font-size:12.5px;padding:6px 11px;}
+  .jp-crit,.jp-ge li{padding:10px 11px;}
+  .jp-logic{padding:11px 12px;font-size:12.5px;}
 }
 @media (min-width:861px){
   .jp-v-side{display:grid;grid-template-columns:repeat(3,minmax(72px,auto));column-gap:20px;}
@@ -755,7 +791,7 @@ body{overflow-x:clip;}
   <section class="view" id="view-jiepan">
     <div class="jp-head">
       <h2>解 盘</h2>
-      <p>先选你问的事，再看这一局怎么说。每条断语都能点开看依据，不替你拍板。</p>
+      <p>断法分三步：先按你问的事取用神，再把这一宫的判据逐条过一遍（门、星、神、宫门生克、十干克应、四害、月令、日干宫、值符宫），最后数助忌定断语。每一步都写明「规则 → 本盘数据 → 所以判什么」，可当场核对，不替你拍板。</p>
     </div>
     <div id="jiepan-box"></div>
   </section>
@@ -833,6 +869,11 @@ body{overflow-x:clip;}
       </div>
     </div>
   </section><!-- /view-about -->
+
+  <footer class="site-foot">
+    <p class="sf-own">本应用归属 <b>杨禹</b></p>
+    <p class="sf-meta">鼠鼠阿仓奇门排盘 v0.64 · 时家转盘 · 拆补法定局</p>
+  </footer>
 
 </div>
 
