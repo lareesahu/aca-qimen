@@ -418,6 +418,8 @@
       }
     }
 
+    if (flat.length) logic += '（平项 ' + flat.length + ' 条，无吉无凶，不左右胜负；决定成败的是助 ' + help.length + ' 与忌 ' + bad.length + '。）';
+
     const advice = buildAdvice(r, q, yong, info, harms, tone, ws);
 
     return {
@@ -548,8 +550,9 @@
       + '<div class="jp-v-body">'
       + '<div class="jp-v-left">'
       + '<div class="jp-v-main">' + a.verdict + '</div>'
-      + '<div class="jp-v-sub"><span>用神 <b>' + a.yong.name + '</b> · ' + P_NAME[a.yong.p] + '（' + P_DIR[a.yong.p] + '）</span>'
-      + '<span>属 <b>' + a.el + '</b> · 气数 <b>' + (a.ws || '—') + '</b></span></div>'
+      + '<div class="jp-v-sub"><span>用神 <b>' + a.yong.name + '</b>（属' + a.el + '）</span>'
+      + '<span>落 ' + P_NAME[a.yong.p] + '（' + P_DIR[a.yong.p] + '）</span>'
+      + '<span>气数 ' + (a.ws || '—') + '</span></div>'
       + '</div>'
       + '<div class="jp-v-side">'
       + '<div><i>' + a.sideLabels[0] + '</i><b class="good">' + a.tally.help + '</b></div>'
@@ -558,7 +561,7 @@
       + '</div>'
       + '</div></div>'
 
-      + '<div class="jp-logic"><b>怎么断的</b><span class="jp-count">助 ' + a.tally.help + ' · 忌 ' + a.tally.harm + ' · 平 ' + a.tally.flat + '（共 ' + (a.tally.help + a.tally.flat + a.tally.harm) + ' 条判据）</span><p>' + a.logic + '</p></div>'
+      + '<div class="jp-logic"><b>怎么断的</b><span class="jp-count"><i class="k1">助 ' + a.tally.help + '</i><i class="k2">忌 ' + a.tally.harm + '</i><i class="k3">平 ' + a.tally.flat + '</i>共 ' + (a.tally.help + a.tally.flat + a.tally.harm) + ' 条判据</span><p>' + a.logic + '</p></div>'
 
       + '<div class="jp-sect"><h4>判据 · 逐条过</h4>'
       + '<ul class="jp-crits">' + a.criteria.map(critHTML).join('') + '</ul>'
