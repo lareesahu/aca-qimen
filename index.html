@@ -321,6 +321,7 @@ h1 .sub{display:block;font-size:13px;font-weight:500;letter-spacing:6px;color:va
   border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;}
 .tab:hover{color:var(--ink);}
 .tab.active{color:var(--zhu);border-bottom-color:var(--zhu);font-weight:700;}
+.tab .badge[hidden]{display:none;}
 .tab .badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:6px;font-size:11px;
   background:var(--zhu);color:#F3ECDD;border-radius:9px;text-align:center;line-height:16px;}
 .view{display:none;}
@@ -569,6 +570,100 @@ body{overflow-x:clip;}
   .cell.selected{box-shadow:inset 0 0 0 2px var(--gold), inset 0 0 26px rgba(166,124,46,.20);}
 }
 </style>
+
+<style>
+/* ===== 解盘 ===== */
+.jp-head{padding:16px 0 6px;}
+.jp-head h2{font-size:20px;letter-spacing:4px;color:var(--ink);margin:0 0 6px;}
+.jp-head p{margin:0;font-size:13px;color:var(--ink-soft);line-height:1.6;}
+.jp-wrap{max-width:820px;margin:0 auto;}
+.jp-qs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 16px;}
+.jp-q{font:inherit;font-size:13px;padding:10px 14px;min-height:44px;border:1px solid var(--line);
+  background:rgba(255,255,255,.45);color:var(--ink-soft);border-radius:999px;cursor:pointer;transition:.18s;}
+.jp-q:hover{color:var(--ink);border-color:var(--gold);}
+.jp-q{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:500;}
+.jp-q .jp-tick{font-size:11px;width:11px;display:inline-block;color:var(--zhu);opacity:0;}
+.jp-q.on{background:rgba(166,61,47,.08);border-color:#A63D2F;color:#8E2B22;font-weight:700;}
+.jp-q.on .jp-tick{opacity:1;}
+.jp-verdict{border-radius:12px;padding:18px 20px 16px;border:1.5px solid var(--line);background:rgba(255,255,255,.62);box-shadow:0 1px 0 rgba(0,0,0,.02);}
+.jp-verdict.good{border-color:#2F6349;background:rgba(62,124,92,.11);}
+.jp-verdict.mid{border-color:var(--gold);background:rgba(166,124,46,.08);}
+.jp-verdict.bad{border-color:#8E2B22;background:rgba(178,58,46,.1);}
+.jp-v-label{font-size:11.5px;letter-spacing:2px;color:#8A6A4E;}
+.jp-v-body{display:flex;gap:24px;align-items:flex-start;justify-content:space-between;}
+.jp-v-side{display:none;gap:20px;text-align:right;flex:0 0 auto;}
+.jp-v-side{align-items:start;}
+.jp-v-side div{display:grid;gap:2px;}
+.jp-v-side i{font-style:normal;font-size:11px;letter-spacing:1px;color:#8A6A4E;}
+.jp-v-side b{font-size:15px;color:var(--ink);letter-spacing:1px;}
+.jp-v-side b.warn{color:#8E2B22;font-size:12.5px;max-width:150px;line-height:1.5;letter-spacing:0;}
+.jp-v-main{font-size:34px;font-weight:700;letter-spacing:2px;color:var(--ink);margin:6px 0 10px;line-height:1.12;}
+.jp-verdict.good .jp-v-main{color:#1F4E38;}
+.jp-verdict.bad .jp-v-main{color:#7A2119;}
+.jp-v-sub{font-size:12.5px;color:#6B5B47;line-height:1.7;border-top:1px dashed var(--line);padding-top:10px;
+  display:flex;flex-wrap:wrap;gap:4px 14px;}
+.jp-v-sub span{white-space:nowrap;}
+.jp-sum-list{margin:0;padding-left:17px;font-size:13.5px;line-height:1.95;color:var(--ink);}
+.jp-sum-list li{margin:2px 0;}
+.jp-sect{margin:24px 0 0;}
+.jp-sect:first-of-type{margin-top:26px;}
+.jp-sect h4{margin:0 0 8px;font-size:13px;letter-spacing:2px;color:var(--zhu);font-weight:700;}
+.jp-list{list-style:none;margin:0;padding:0;display:grid;gap:7px;}
+.jp-row{display:grid;grid-template-columns:104px 1fr;gap:10px 14px;padding:11px 12px;border-radius:8px;
+  background:rgba(255,255,255,.42);border:1px solid var(--line);font-size:13.5px;line-height:1.75;}
+.jp-row.pos{border-left:3px solid #3E7C5C;}
+.jp-row.neg{border-left:3px solid #B23A2E;}
+.jp-row.neu{border-left:3px solid var(--line);}
+.jp-lbl{color:var(--ink-soft);font-size:12px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.jp-txt{color:var(--ink);}
+.jp-chip{font-size:10.5px;padding:1px 6px;border-radius:999px;letter-spacing:1px;}
+.jp-chip.good{background:rgba(62,124,92,.15);color:#2F6349;}
+.jp-chip.mid{background:rgba(166,124,46,.2);color:#6E5320;}
+.jp-chip.bad{background:rgba(178,58,46,.13);color:#8E2B22;}
+.jp-why{grid-column:2;justify-self:start;}
+.jp-why{margin-top:6px;}
+.jp-why summary{cursor:pointer;font-size:12px;color:#8A6A4E;list-style:none;padding:9px 12px;min-height:40px;
+  display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;
+  background:rgba(243,236,221,.7);}
+.jp-why summary:hover{border-color:var(--gold);color:var(--zhu);}
+.jp-why summary::-webkit-details-marker{display:none;}
+.jp-why summary::before{content:'▸ ';}
+.jp-why[open] summary::before{content:'▾ ';}
+.jp-why div{font-size:11.5px;color:#7A6A55;line-height:1.6;padding:5px 0 0 10px;border-left:1px dashed var(--line);margin-top:4px;}
+.jp-adv{margin:0;padding-left:18px;font-size:13px;line-height:1.85;color:var(--ink);}
+.jp-steps{display:grid;gap:7px;}
+.jp-step{background:rgba(255,255,255,.42);border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.jp-step summary{cursor:pointer;padding:12px 13px;min-height:44px;font-size:13.5px;font-weight:600;color:var(--ink);list-style:none;display:flex;align-items:center;}
+.jp-step summary::-webkit-details-marker{display:none;}
+.jp-step summary::before{content:'▸ ';color:var(--gold);}
+.jp-step[open] summary::before{content:'▾ ';}
+.jp-step-body{padding:0 13px 13px;font-size:13.5px;line-height:1.9;color:var(--ink);max-width:36em;}
+.jp-dim{color:var(--ink-soft);font-size:12px;}
+.jp-goto{margin-top:8px;font:inherit;font-size:12.5px;padding:8px 12px;min-height:40px;border-radius:6px;
+  border:1px solid var(--gold);background:transparent;color:var(--zhu);cursor:pointer;}
+.jp-legend{display:inline-flex;align-items:center;gap:5px;margin-right:10px;vertical-align:middle;}
+.jp-legend i{width:3px;height:12px;border-radius:2px;display:inline-block;}
+.jp-legend i.pos{background:#3E7C5C;}
+.jp-legend i.neg{background:#B23A2E;}
+.jp-legend i.neu{background:var(--line);margin-left:6px;}
+.jp-foot{margin:22px 0 8px;font-size:11.5px;color:var(--ink-soft);line-height:1.7;
+  border-top:1px dashed var(--line);padding-top:10px;}
+.jp-empty{padding:26px 4px;font-size:13px;color:var(--ink-soft);text-align:center;}
+@media (max-width:560px){
+  .jp-qs{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .jp-q{width:100%;text-align:center;}
+  .jp-v-main{font-size:28px;}
+  .jp-row{grid-template-columns:1fr;gap:3px;}
+  .jp-why{grid-column:1;}
+  .jp-q{font-size:12.5px;padding:6px 11px;}
+}
+@media (min-width:861px){
+  .jp-v-side{display:grid;grid-template-columns:repeat(3,minmax(72px,auto));column-gap:20px;}
+  .jp-row{grid-template-columns:104px minmax(0,1fr) 92px;align-items:start;}
+  .jp-why{grid-column:3;justify-self:end;}
+  .jp-row .jp-txt{grid-column:2;}
+}
+</style>
 </head>
 <body>
 <div id="splash">
@@ -604,8 +699,9 @@ body{overflow-x:clip;}
 
   <nav class="tabs">
     <button class="tab active" data-view="view-paipan">排 盘</button>
+    <button class="tab" data-view="view-jiepan">解 盘</button>
     <button class="tab" data-view="view-hl">河图洛书</button>
-    <button class="tab" data-view="view-archives">我的起局<span class="badge" id="arch-count">0</span></button>
+    <button class="tab" data-view="view-archives">我的起局<span class="badge" id="arch-count" hidden>0</span></button>
     <button class="tab" data-view="view-about">关 于</button>
   </nav>
 
@@ -654,6 +750,15 @@ body{overflow-x:clip;}
     </div>
   </section>
   </section><!-- /view-paipan -->
+
+  <!-- ============ 视图：解盘 ============ -->
+  <section class="view" id="view-jiepan">
+    <div class="jp-head">
+      <h2>解 盘</h2>
+      <p>先选你问的事，再看这一局怎么说。每条断语都能点开看依据，不替你拍板。</p>
+    </div>
+    <div id="jiepan-box"></div>
+  </section>
 
   <!-- ============ 视图：河图洛书介绍 ============ -->
   <section class="view" id="view-hl">
@@ -1804,8 +1909,34 @@ document.querySelectorAll('.tab').forEach(t=>{
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById(t.dataset.view).classList.add('active');
     if(t.dataset.view==='view-archives') renderArchives();
+    if(t.dataset.view==='view-jiepan') renderJiepanView();
   });
 });
+
+// ===== 解盘 =====
+let jpQuestion='general';
+let jpTabActive=false;
+function renderJiepanView(){
+  const box=document.getElementById('jiepan-box');
+  if(!box || !window.JiePan) return;
+  jpTabActive=true;
+  JiePan.render(box, lastResult, jpQuestion, {
+    onQuestion:(q)=>{ jpQuestion=q; renderJiepanView(); },
+    onGoto:(p)=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelector('.tab[data-view="view-paipan"]').classList.add('active');
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      document.getElementById('view-paipan').classList.add('active');
+      jpTabActive=false;
+      renderDetail(p);
+      const d=document.getElementById('palace-detail');
+      if(d) d.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  });
+}
+// 排完盘后，若解盘标签仍开着就同步刷新
+const _jpRender=render;
+render=function(r){ _jpRender(r); if(jpTabActive) renderJiepanView(); };
 
 // ===== 存档（localStorage 持久化） =====
 const ARCH_KEY='aca-qimen-archives';
@@ -1817,7 +1948,10 @@ function saveArchives(list){
   updateArchBadge();
 }
 function updateArchBadge(){
-  document.getElementById('arch-count').textContent=loadArchives().length;
+  const b=document.getElementById('arch-count'); if(!b) return;
+  const n=loadArchives().length;
+  b.textContent=n;
+  b.hidden = n===0;          /* 0 时不显示红点，避免无信息噪音 */
 }
 function fmtTs(ts){
   const d=new Date(ts);
@@ -2082,5 +2216,6 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   });
 }
 </script>
+<script src="./assets/jiepan.js"></script>
 </body>
 </html>

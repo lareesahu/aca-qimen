@@ -1,7 +1,7 @@
-const CACHE = 'aca-qimen-v1';
+const CACHE = 'aca-qimen-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest',
   './assets/fonts/NotoSerifSC-VF-sub.woff2', './assets/fonts/NotoSansSC-VF-sub.woff2',
-  './assets/icons/icon-192.png', './assets/icons/icon-512.png'];
+  './assets/icons/icon-192.png', './assets/icons/icon-512.png', './assets/jiepan.js'];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
