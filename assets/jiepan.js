@@ -21,6 +21,13 @@
   const SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };   // A 生 SHENG[A]
   const KE = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };       // A 克 KE[A]
 
+  // 八神条目开头写的是神自身方位（如「南方：…」），放进落宫句子里会跟宫位混淆，只取冒号后的象意
+  const shenText = (name) => {
+    const t = (typeof SHEN_INFO !== 'undefined' && SHEN_INFO[name]) || '';
+    const i = t.indexOf('：');
+    return i >= 0 ? t.slice(i + 1) : t;
+  };
+
   const rel = (a, b) => {           // a 对 b 的关系
     if (!a || !b) return '无';
     if (a === b) return '同';
@@ -163,7 +170,7 @@
     if (info.shen && SHEN_LEVEL[info.shen] !== undefined) {
       const lv = SHEN_LEVEL[info.shen];
       const lbl = yong.kind === '神' ? '用神之神' : '所临八神';
-      add(lbl, `${info.shen}临宫，${LV_NAME[lv]}神。${SHEN_INFO[info.shen] || ''}`, lv * 0.7,
+      add(lbl, `${info.shen}临宫，${LV_NAME[lv]}神。${shenText(info.shen)}`, lv * 0.7,
         '八神吉凶：值符、太阴、六合、九地、九天为吉；螣蛇、白虎、玄武为凶。');
     }
     // 4. 宫与用神生克
