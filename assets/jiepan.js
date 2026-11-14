@@ -846,7 +846,14 @@
     }
     if (y.men) why.push('<li><b>你走的这条路</b>' + y.men + '，' + (DRAMA_MEN[y.men] || '按老路走') + '。</li>');
     if (y.shen) why.push('<li><b>背后那股力</b>' + y.shen + '，' + (DRAMA_SHEN[y.shen] || '看不清') + '。</li>');
-    if (g1) why.push('<li><b>能帮你的</b>' + (GLOSS_STAR[g1.name] || g1.name) + '，这条是往前的。</li>');
+    if (g1) {
+      const gn = g1.name === '所临八神' ? (y.shen || g1.name)
+        : g1.name === '所临九星' ? (y.tianXing || g1.name)
+        : (g1.name === '同宫之门' || g1.name === '用神（门）') ? (y.men || g1.name)
+        : g1.name;
+      const gd = GLOSS_STAR[gn] || DRAMA_SHEN[gn] || DRAMA_MEN[gn] || '';
+      why.push('<li><b>能帮你的</b>' + gn + (gd ? '，' + gd : '') + '，这条是往前的。</li>');
+    }
 
     const todo = [];
     const act = (a.advice || []).filter(function (t) { return /^(先|可|宜|找|把|不)/.test(t); });
