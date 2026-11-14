@@ -670,6 +670,13 @@ body{overflow-x:clip;}
 .jp-ai-fine{margin:14px 0 0;font-size:11.5px;line-height:1.9;color:var(--ink);opacity:.66;}
 .jp-ai-fine span{display:inline-block;}
 @media (max-width:520px){.jp-ai-act{gap:10px;}.jp-ai-copy{min-height:44px;flex:1 1 auto;text-align:center;}.jp-ai-go{min-height:44px;}}
+/* ---- 存档查看：断语条 + 看解盘 ---- */
+.vm-verdict{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;padding:11px 14px;margin-bottom:12px;border:1px solid rgba(166,124,46,.22);border-radius:12px;background:rgba(255,255,255,.5);font-size:12.5px;color:var(--ink);}
+.vm-verdict b{color:var(--zhu);font-size:14.5px;letter-spacing:.5px;}
+.vm-verdict span{opacity:.75;}
+#vm-jiepan{margin-right:8px;font-size:12.5px;}
+@media (max-width:520px){.vm-verdict{gap:6px 10px;font-size:12px;}#vm-jiepan{margin-right:4px;padding:6px 10px;}}
+
 /* ---- 爽剧版 ---- */
 .jp-drama-title{font-size:20px;letter-spacing:1.5px;color:var(--zhu);margin:2px 0 12px;}
 .jp-drama-cast{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:6px;font-size:12.5px;line-height:1.8;color:var(--ink);opacity:.9;}
@@ -969,9 +976,11 @@ body{overflow-x:clip;}
         <div class="vm-title" id="vm-title">此 局</div>
         <div class="vm-meta" id="vm-meta"></div>
       </div>
+      <button class="btn ghost" id="vm-jiepan" title="把这个局带进解盘页">看 解 盘</button>
       <button class="vm-close" id="vm-close" title="关闭">✕</button>
     </div>
     <div class="vm-body">
+      <div class="vm-verdict" id="vm-verdict"></div>
       <div class="grid9" id="vm-grid9"></div>
       <section class="palace-detail" id="vm-detail" style="display:none"></section>
       <div class="vm-note-sec">
@@ -2169,7 +2178,26 @@ function openArchiveView(a){
       openPalaceNote(p2, notes, b2, ()=>saveArchivesDebounced(), ()=>refreshVm(p2));
     }});
   }
+  const strip=document.getElementById('vm-verdict');
+  if(strip){
+    if(window.JiePan){
+      const an=window.JiePan.analyze(r,'general');
+      strip.innerHTML='<b>'+an.verdict+'</b>'
+        +'<span>用神 '+an.yong.name+'</span>'
+        +'<span>落 '+P_NAME[an.yong.p]+'</span>'
+        +'<span>气数 '+an.ws+'</span>'
+        +'<span>助 '+an.tally.help+' · 忌 '+an.tally.harm+'</span>';
+    }else{ strip.innerHTML=''; }
+  }
   document.getElementById('view-mask').classList.add('open');
+  const jpBtn=document.getElementById('vm-jiepan');
+  if(jpBtn) jpBtn.onclick=()=>{
+    document.getElementById('view-mask').classList.remove('open');
+    render(r);                     // 把这一局放回排盘页，四柱、九宫都跟着换
+    const jt=document.querySelector('.tab[data-view="view-jiepan"]');
+    if(jt) jt.click(); else renderJiepanView();
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
 }
 let archSaveTimer=null;
 function saveArchivesDebounced(){
