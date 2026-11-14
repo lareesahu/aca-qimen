@@ -546,6 +546,21 @@
       out: '篇幅 700–900 字，第二人称或第三人称皆可，纯叙事，不要小标题。'
     },
     {
+      key: 'shuangju', name: '竖屏短剧版', tag: '三分钟一集，先立人设，再见冲突，最后给一个能演的动作',
+      say: '写成一集竖屏短剧：开场、卡住、翻盘、钩子。',
+      body: [
+        '你写竖屏短剧的解说与分镜。按下面这张奇门盘的「气」写一集，主角是求测人本人，不要写成算命。',
+        '【写作铁律】',
+        '1. 开头 3 秒要有反差：一个动作、一句台词，把人物立在屏幕上，不用旁白介绍身份。',
+        '2. 冲突来自性格与处境的咬合，不是天降反派。可以有人使绊子，那是外因。',
+        '3. 破局必须是一个能拍出来的具体动作或一句话，不是心态转变。',
+        '4. 盘上的门、星、神、四害都要变成场面：门是走的路，星是来的人，神是暗处的力，四害是旧习惯。',
+        '5. 不写系统、金手指、数值；不出现「命盘说」「格局显示」。',
+        '6. 结尾留一句钩子，不总结道理、不给建议清单。'
+      ],
+      out: '分四段给：① 人物表（主角/对手/帮手各一行）② 四幕（出场·卡住·翻盘·钩子，每幕 80–120 字，各配一句台词）③ 一句剪辑提示。总长 600–800 字。'
+    },
+    {
       key: 'shuoshu', name: '说书先生版', tag: '茶馆评书腔，惊堂木一响，留个扣子',
       say: '写成一段茶馆评书，说给满堂的人听。',
       body: [
@@ -649,6 +664,118 @@
     });
   }
 
+  // ---------- 爽剧版 · 按本盘数据演出来 ----------
+  // 短剧的骨架：立人设 → 卡住 → 翻盘 → 留钩子。每一幕都挂在本盘真实的门、星、神、四害、克应上。
+  const DRAMA_MEN = {
+    开门: '推门就进，见人就谈', 休门: '等风来，等对方先动',
+    生门: '把事做大，把利养住', 伤门: '出手快，先撞一下再说',
+    杜门: '关起门来做，不给人看', 景门: '把话说给所有人听',
+    死门: '收摊，把旧账一笔笔清掉', 惊门: '一开口，对面先慌'
+  };
+  const DRAMA_SHEN = {
+    值符: '背后有人撑着', 螣蛇: '身边缠着一根线', 太阴: '暗处有人递话',
+    六合: '中间人把两边拉着', 白虎: '对面带着火气来', 玄武: '有人把话拿走了',
+    九地: '蹲在低处不动', 九天: '站在高处喊话'
+  };
+  const DRAMA_ACT = {
+    开门: '约那个最该约的人见一面，把话当面说开。',
+    休门: '这一集先不动，给自己三天，等对方先开口。',
+    生门: '把最小那件事先做出一个结果，先见人、先见钱。',
+    伤门: '该拍一次桌子了，把界限当面划出来。',
+    杜门: '关起门来把一件做完，这件事不告诉任何人。',
+    景门: '把这件事说出去，让该听见的人听见。',
+    死门: '把一件旧事彻底结掉，账清、字据留好。',
+    惊门: '先把最坏的情况说出口，再看对面怎么接。'
+  };
+
+  function dramaSection(r, a) {
+    const P = r.palaces || {};
+    const dP = a.dayPalace || a.yong.p;
+    const d = P[dP] || {}, y = P[a.yong.p] || {};
+    const short = t => (t || '').replace(/（[^）]*）/g, '');
+    const men = y.men || '';
+    const dMen = d.men || '';
+
+    const bads = (a.criteria || []).filter(function (c) { return c.judge === '忌'; });
+    const goods = (a.criteria || []).filter(function (c) { return c.judge === '助'; });
+    const b1 = bads[0], g1 = goods[0];
+    const harm1 = (a.harms && a.harms[0]) || null;
+
+    // 人物：从盘上取具体的门、星、神，写成能演的人，不用「所临九星」这种条文腔
+    const opp = harm1
+      ? harm1.k + '（' + short(harm1.why || '旧习惯') + '）'
+      : '没有明面上的反派，阻力是你自己那口气';
+    const ally = (y.shen && DRAMA_SHEN[y.shen])
+      ? y.shen + '（' + DRAMA_SHEN[y.shen] + '）'
+      : (g1 ? g1.name + '（' + short(g1.data) + '）' : '贵人不在明面上，全靠自己撑');
+
+    const cast = [
+      '主角：你 —— 日干' + a.dayGan + '落' + P_NAME[dP] + '，'
+        + (dMen ? dMen + ' · ' : '') + (d.tianXing || '—') + ' · ' + (d.shen || '—') + '。'
+        + (DRAMA_MEN[dMen] ? DRAMA_MEN[dMen] + '的那种人。' : ''),
+      '对手：' + opp,
+      '帮手：' + ally
+    ];
+
+    // 破局动作：优先取一条能落地的建议，跳过纯方位提示
+    // 条文腔的名字换成盘上的实体
+    const human = function (name) {
+      if (name === '所临九星') return y.tianXing || name;
+      if (name === '所临八神') return y.shen || name;
+      if (name === '同宫之门' || name === '用神（门）') return men || name;
+      return name;
+    };
+
+    const say = function (name, data) {
+      const n = human(name), d = short(data);
+      return d.indexOf(n) === 0 ? d + '。' : n + '——' + d + '。';
+    };
+
+    const actAdv = (a.advice || []).filter(function (t) {
+      return /^(先|可|宜|找|把|不)/.test(t);
+    })[0] || DRAMA_ACT[men] || '把力气收回来，先动一处最小的。';
+
+    const acts = [];
+    acts.push({
+      h: '第一幕 · 出场',
+      p: (dMen ? dMen + '的人，' : '') + (DRAMA_MEN[dMen] || '按老路走') + '；'
+        + (d.shen ? d.shen + '贴着背走，' + (DRAMA_SHEN[d.shen] || '身后没人') : '身后没人') + '。'
+        + '手里的事落在' + P_NAME[a.yong.p] + '：' + (men || '—') + ' · ' + (y.tianXing || '—')
+        + ' · ' + (y.shen || '—') + '，一进门就是这个场面。',
+      q: '「这事我认，但我不认这个局面。」'
+    });
+    acts.push({
+      h: '第二幕 · 卡住',
+      p: (harm1
+        ? '卡在' + harm1.k + '上：' + short(harm1.why || '') + '。'
+        : (b1 ? say(b1.name, b1.data) : '这一盘没有一处卡死的地方，卡的是你把事想复杂了。'))
+        + (b1 && harm1 ? '再往下看也不帮忙：' + short(b1.data) + '。' : '')
+        + '这一关不是别人设的，是你自己走熟的那条路。',
+      q: '「不是我赢不了，是我一直在替别人演。」'
+    });
+    acts.push({
+      h: '第三幕 · 翻盘',
+      p: (g1 ? say(g1.name, g1.data) : '')
+        + '这一集只做一个动作：' + actAdv,
+      q: '「这一次，我先把话说完。」'
+    });
+    acts.push({
+      h: '尾幕 · 钩子',
+      p: '本盘判「' + a.verdict + '」：助 ' + a.tally.help + ' 条、忌 ' + a.tally.harm
+        + ' 条、平 ' + a.tally.flat + ' 条。戏到这里收，路还在这张盘上。',
+      q: '「下一集，这一关我自己去。」'
+    });
+
+    return '<div class="jp-sect jp-drama"><h4>爽剧版 · 四幕</h4>'
+      + '<p class="jp-ai-note">同一张盘，按竖屏短剧的路子演一遍：先立人设，再见冲突，最后给一个能演出来的破局动作。每一幕都挂在盘上的门、星、神和四害上，不另外编。</p>'
+      + '<div class="jp-drama-title">《' + P_DIR[a.yong.p] + '方，那扇' + (men || a.yong.name) + '》</div>'
+      + '<ul class="jp-drama-cast">' + cast.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>'
+      + '<div class="jp-drama-acts">' + acts.map(function (s) {
+        return '<div class="jp-drama-act"><b>' + s.h + '</b><p>' + s.p + '</p><em>' + s.q + '</em></div>';
+      }).join('') + '</div>'
+      + '<p class="jp-ai-fine"><span>戏是文学演绎，不是断语；</span><span>结论以本页判据为准。</span><span>不作期日断言。</span><span>健康问题请就医。</span></p></div>';
+  }
+
   function aiSection(r, a) {
     const cards = AI_STYLES.map(function (st) {
       return '<div class="jp-ai-card" data-style="' + st.key + '">'
@@ -716,6 +843,8 @@
       + a.advice.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>'
 
       + '<div class="jp-sect"><h4>这一局怎么读出来 · 六步</h4><div class="jp-steps" id="jp-steps"></div></div>'
+
+      + dramaSection(r, a)
 
       + aiSection(r, a)
 
