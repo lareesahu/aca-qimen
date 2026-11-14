@@ -677,6 +677,31 @@ body{overflow-x:clip;}
 #vm-jiepan{margin-right:8px;font-size:12.5px;}
 @media (max-width:520px){.vm-verdict{gap:6px 10px;font-size:12px;}#vm-jiepan{margin-right:4px;padding:6px 10px;}}
 
+/* ---- 先说人话 ---- */
+.jp-plain{background:rgba(255,255,255,.55);border:1px solid rgba(166,124,46,.22);border-radius:14px;padding:18px 18px 16px;}
+.jp-plain h4{margin:0 0 10px;}
+.jp-plain-lead{margin:0 0 14px;font-size:16px;line-height:1.85;color:var(--ink);letter-spacing:.2px;}
+.jp-plain-list{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:9px;}
+.jp-plain-list li{font-size:14px;line-height:1.9;color:var(--ink);padding-left:14px;position:relative;}
+.jp-plain-list li:before{content:'';position:absolute;left:0;top:.8em;width:5px;height:5px;border-radius:50%;background:var(--zhu);opacity:.55;}
+.jp-plain-list b{font-weight:600;margin-right:.5em;color:var(--zhu);}
+.jp-plain-do{border-top:1px dashed rgba(166,124,46,.28);padding-top:12px;}
+.jp-plain-do>b{display:block;font-size:12.5px;letter-spacing:1.4px;color:var(--ink);opacity:.7;margin-bottom:7px;}
+.jp-plain-do ul{margin:0;padding-left:18px;display:grid;gap:6px;}
+.jp-plain-do li{font-size:14px;line-height:1.85;}
+.jp-plain-air{margin:13px 0 0;font-size:13px;line-height:1.85;color:var(--ink);opacity:.78;}
+
+/* ---- AI 解读 ---- */
+.jp-ai-chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 12px;}
+.jp-ai-chip{padding:8px 13px;min-height:38px;border:1px solid rgba(166,124,46,.35);border-radius:999px;background:rgba(255,255,255,.6);color:var(--ink);font-size:13px;cursor:pointer;transition:.18s;}
+.jp-ai-chip.on{background:var(--zhu);border-color:var(--zhu);color:#fff;}
+.jp-ai-out{margin:14px 0 0;padding:16px 17px;border:1px solid rgba(166,124,46,.24);border-radius:14px;background:rgba(255,255,255,.72);font-size:14.5px;line-height:2;color:var(--ink);white-space:pre-wrap;}
+.jp-ai-keyrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 0;}
+.jp-ai-key{flex:1 1 240px;min-height:42px;padding:9px 12px;border:1px solid rgba(166,124,46,.35);border-radius:10px;font-size:14px;background:#fff;}
+.jp-ai-keysave{min-height:42px;padding:9px 16px;border:none;border-radius:10px;background:var(--zhu);color:#fff;font-size:14px;cursor:pointer;}
+.jp-ai-keytip{flex:1 1 100%;font-size:11.5px;line-height:1.7;color:var(--ink);opacity:.6;}
+@media (max-width:520px){.jp-plain{padding:15px 14px 14px;}.jp-plain-lead{font-size:15px;}.jp-ai-chip{font-size:12.5px;padding:8px 11px;}.jp-ai-out{font-size:14px;line-height:1.95;}}
+
 /* ---- 爽剧版 ---- */
 .jp-drama-title{font-size:20px;letter-spacing:1.5px;color:var(--zhu);margin:2px 0 12px;}
 .jp-drama-cast{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:6px;font-size:12.5px;line-height:1.8;color:var(--ink);opacity:.9;}

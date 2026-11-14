@@ -532,6 +532,19 @@
   // 每条提示词都用本盘真实数据填好，不留 [占位符]；密钥不进页面，只做复制与跳转。
   const AI_STYLES = [
     {
+      key: 'plain', name: '大白话版', tag: '不绕术语，一句一句说清楚', say: '用大白话把这盘讲明白。',
+      body: [
+        '你在给一个完全不懂奇门遁甲的人讲这张盘。他只想听懂三件事：现在是什么情况、卡在哪、该干什么。',
+        '【怎么说】',
+        '1. 像跟朋友吃饭时说话，短句，一句一个意思。',
+        '2. 盘上的词（门、星、神、击刑、入墓、气数）不许裸着用；每出现一个，后面立刻跟一句白话，说它在这个人身上是什么意思。',
+        '3. 不用文言，不堆四字词，不写「旺相休囚」「格局」这种行话。',
+        '4. 先说结论，再说为什么，最后给两个今天就能做的动作。',
+        '5. 不预言日期，不许诺结果，涉及健康让他去看医生。'
+      ],
+      out: '400–600 字，三段：结论一段、为什么一段、现在做什么一段。第一句必须是人话，不许出现任何术语。'
+    },
+    {
       key: 'shuangwen', name: '爽文小说版', tag: '先立这个人，再起冲突，不靠打脸',
       say: '写成一个短篇，主角是求测人本人。',
       body: [
@@ -776,19 +789,149 @@
       + '<p class="jp-ai-fine"><span>戏是文学演绎，不是断语；</span><span>结论以本页判据为准。</span><span>不作期日断言。</span><span>健康问题请就医。</span></p></div>';
   }
 
+  // ---------- 先说人话 ----------
+  // 盘上的术语一个不落地翻成日常话，读者不需要懂奇门也能看明白这盘说了什么。
+  const GLOSS_HARM = {
+    '击刑': '你跟规矩顶上了，硬碰硬，谁也不让',
+    '入墓': '事情被压住了，发不出去',
+    '门迫': '你站在一条不顺的路上硬推',
+    '空亡': '这事眼下是空的，说了不算',
+    '伏吟': '原地打转，来回折腾',
+    '反吟': '事情反过来走，折腾一次还不够',
+    '驿马': '你想动，坐不住',
+    '相冲': '两股劲对着撞',
+    '伏干格': '底下的人和事拖着你不放',
+    '飞干格': '上面的人一压，你只能躲'
+  };
+  const GLOSS_WS = {
+    '旺': '这股气很足，你推得动',
+    '相': '这股气不错，推得动',
+    '休': '这股气一般，能推但费劲',
+    '囚': '这股气弱，硬推会累',
+    '死': '这股气没了，先别推，等一等'
+  };
+  const GLOSS_STAR = {
+    天蓬: '胆子大、路子野的人', 天任: '肯扛事、也认死理的人', 天冲: '冲劲足、刹不住的人',
+    天辅: '讲道理、爱教人的人', 天英: '要场面、怕丢脸的人', 天芮: '心里带着旧病的人',
+    天柱: '嘴硬、爱顶的人', 天心: '算得精、想得多的人', 天禽: '居中调度、不动手的人'
+  };
+
+  function plainVerdict(v) {
+    if (/可为/.test(v)) return '这事能做，但会带点伤，不是一路顺风。';
+    if (/难成|不成|难/.test(v)) return '现在做难成，缓一缓，或者换个法子更划算。';
+    if (/反复|半成/.test(v)) return '会来回折腾，能成一半，得给自己留个后手。';
+    if (/顺|吉|利/.test(v)) return '整体是顺的，可以往前推。';
+    if (/凶|不利|宜缓/.test(v)) return '眼下不顺，先守住手里有的，别再加码。';
+    return '这盘没给出一句干脆的话，得看你问的到底是哪一件事。';
+  }
+  function glossOf(c) {
+    const n = (c.name || '') + (c.data || '');
+    const keys = Object.keys(GLOSS_HARM);
+    for (let i = 0; i < keys.length; i++) if (n.indexOf(keys[i]) >= 0) return GLOSS_HARM[keys[i]];
+    return '';
+  }
+
+  function plainSection(r, a) {
+    const P = r.palaces || {};
+    const y = P[a.yong.p] || {};
+    const bads = (a.criteria || []).filter(function (c) { return c.judge === '忌'; });
+    const goods = (a.criteria || []).filter(function (c) { return c.judge === '助'; });
+    const b1 = (a.harms && a.harms[0]) ? { k: a.harms[0].k } : (bads[0] || null);
+    const g1 = goods[0] || null;
+
+    const why = [];
+    if (b1) {
+      const g = GLOSS_HARM[b1.k] || glossOf(b1) || '这一条在拖你后腿';
+      why.push('<li><b>卡在哪</b>' + b1.k + '——' + g + '。</li>');
+    }
+    if (y.men) why.push('<li><b>你走的这条路</b>' + y.men + '，' + (DRAMA_MEN[y.men] || '按老路走') + '。</li>');
+    if (y.shen) why.push('<li><b>背后那股力</b>' + y.shen + '，' + (DRAMA_SHEN[y.shen] || '看不清') + '。</li>');
+    if (g1) why.push('<li><b>能帮你的</b>' + (GLOSS_STAR[g1.name] || g1.name) + '，这条是往前的。</li>');
+
+    const todo = [];
+    const act = (a.advice || []).filter(function (t) { return /^(先|可|宜|找|把|不)/.test(t); });
+    if (act[0]) todo.push('<li>' + act[0] + '</li>');
+    if (DRAMA_ACT[y.men]) todo.push('<li>' + DRAMA_ACT[y.men] + '</li>');
+    if (!todo.length) todo.push('<li>这一盘没有给出具体动作，先把手上最小的一件做完再说。</li>');
+
+    return '<div class="jp-sect jp-plain"><h4>先说人话</h4>'
+      + '<p class="jp-plain-lead">' + plainVerdict(a.verdict) + '</p>'
+      + '<ul class="jp-plain-list">' + why.join('') + '</ul>'
+      + '<div class="jp-plain-do"><b>现在能做</b><ul>' + todo.join('') + '</ul></div>'
+      + '<p class="jp-plain-air">这股气现在是「' + (a.ws || '—') + '」——' + (GLOSS_WS[a.ws] || '说不准') + '。</p>'
+      + '</div>';
+  }
+
+  const KEY_LS = 'aca-qimen-ds-key';
+  function dsKey() { try { return localStorage.getItem(KEY_LS) || ''; } catch (e) { return ''; } }
+  const AI_SYS = '你是把奇门遁甲讲成人话的人，读者一点术数都不懂。规矩：术语不许裸用，每出现一个立刻跟一句白话，说清它在这个人身上是什么意思；短句，一句一个意思，句句有主语；不用文言，不堆四字词，不写行话；不预言具体日期，不许诺结果；涉及健康一律先说去看医生；最后一行写：仅供娱乐，不作决策依据。';
+
+  async function aiRun(styleKey, box, btn, r, a) {
+    const key = dsKey();
+    const st = AI_STYLES.filter(function (s) { return s.key === styleKey; })[0] || AI_STYLES[0];
+    box.hidden = false;
+    box.textContent = '正在写…';
+    btn.disabled = true;
+    try {
+      const resp = await fetch('https://api.deepseek.com/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({
+          model: 'deepseek-chat', stream: true, temperature: 1.15,
+          messages: [
+            { role: 'system', content: AI_SYS },
+            { role: 'user', content: aiPrompt(r, a, st) }
+          ]
+        })
+      });
+      if (!resp.ok) {
+        const t = await resp.text();
+        throw new Error('HTTP ' + resp.status + ' ' + t.slice(0, 140));
+      }
+      const reader = resp.body.getReader();
+      const dec = new TextDecoder();
+      let buf = '', out = '';
+      while (true) {
+        const rd = await reader.read();
+        if (rd.done) break;
+        buf += dec.decode(rd.value, { stream: true });
+        let i;
+        while ((i = buf.indexOf('\n')) >= 0) {
+          const line = buf.slice(0, i).trim();
+          buf = buf.slice(i + 1);
+          if (line.indexOf('data:') !== 0) continue;
+          const payload = line.slice(5).trim();
+          if (!payload || payload === '[DONE]') continue;
+          try {
+            const j = JSON.parse(payload);
+            const d = (j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content) || '';
+            if (d) { out += d; box.textContent = out; }
+          } catch (e) { }
+        }
+      }
+      if (!out) box.textContent = '这次没拿到内容，再点一次试试。';
+    } catch (e) {
+      box.textContent = '生成失败：' + (e.message || e) + '（多半是 Key 不对或网络不通）';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
   function aiSection(r, a) {
-    const cards = AI_STYLES.map(function (st) {
-      return '<div class="jp-ai-card" data-style="' + st.key + '">'
-        + '<div class="jp-ai-head"><b>' + st.name + '</b><em>' + st.tag + '</em></div>'
-        + '<div class="jp-ai-act">'
-        + '<button class="jp-ai-copy" data-style="' + st.key + '">复制提示词</button>'
-        + '<button class="jp-ai-go" data-style="' + st.key + '">丢给 ChatGPT ↗</button>'
-        + '</div></div>';
+    const chips = AI_STYLES.map(function (st, i) {
+      return '<button class="jp-ai-chip' + (i === 0 ? ' on' : '') + '" data-style="' + st.key + '" aria-pressed="' + (i === 0) + '">' + st.name + '</button>';
     }).join('');
-    return '<div class="jp-sect jp-ai"><h4>趣味AI解读</h4>'
-      + '<p class="jp-ai-note">同一张盘，换一副嗓子讲。四条提示词都已用你这盘的真实数据填好，宫、星、门、神、四害都在里面。</p>'
-      + '<div class="jp-ai-grid">' + cards + '</div>'
-      + '<p class="jp-ai-fine"><span>盘面结论只在本页；</span><span>故事的吉凶是文学，不是断语。</span><span>仅供娱乐。</span><span>健康问题请就医。</span></p></div>';
+    return '<div class="jp-sect jp-ai"><h4>AI 解读</h4>'
+      + '<p class="jp-ai-note">用你这张盘的真实数据现写一段，人话版本。第一次用贴一次 DeepSeek Key，只存在这台设备的浏览器里，不发到任何服务器。</p>'
+      + '<div class="jp-ai-chips">' + chips + '</div>'
+      + '<div class="jp-ai-act">'
+      + '<button class="jp-ai-gen">生成解读</button>'
+      + '<button class="jp-ai-copy2">复制提示词</button>'
+      + '</div>'
+      + '<div class="jp-ai-keyrow" hidden><input class="jp-ai-key" type="password" autocomplete="off" placeholder="粘贴 DeepSeek Key（sk-…）"><button class="jp-ai-keysave">保存</button>'
+      + '<span class="jp-ai-keytip">到 platform.deepseek.com 取。只写进本机 localStorage，页面源码里没有密钥。</span></div>'
+      + '<div class="jp-ai-out" hidden></div>'
+      + '<p class="jp-ai-fine"><span>AI 写的是文学演绎，不是断语；</span><span>结论以本页判据为准。</span><span>不作期日断言。</span><span>健康问题请就医。</span></p></div>';
   }
 
   function render(container, r, qKey, opts) {
@@ -824,6 +967,8 @@
       + '<div><i>' + a.sideLabels[2] + '</i><b>' + a.tally.flat + '</b></div>'
       + '</div>'
       + '</div></div>'
+
+      + plainSection(r, a)
 
       + '<div class="jp-logic"><b>怎么断的</b><span class="jp-count"><i class="k1">助 ' + a.tally.help + '</i><i class="k2">忌 ' + a.tally.harm + '</i><i class="k3">平 ' + a.tally.flat + '</i>共 ' + (a.tally.help + a.tally.flat + a.tally.harm) + ' 条判据</span><p>' + a.logic + '</p></div>'
 
@@ -870,6 +1015,50 @@
     });
     container.querySelectorAll('.jp-goto').forEach(function (b) {
       b.addEventListener('click', function () { if (opts.onGoto) opts.onGoto(parseInt(b.dataset.palace, 10)); });
+    });
+
+    // AI 解读：内置生成（Key 只在本机 localStorage）
+    let curStyle = 'plain';
+    const aiOut = container.querySelector('.jp-ai-out');
+    const aiKeyRow = container.querySelector('.jp-ai-keyrow');
+    const aiKeyIn = container.querySelector('.jp-ai-key');
+    const aiGen = container.querySelector('.jp-ai-gen');
+    container.querySelectorAll('.jp-ai-chip').forEach(function (b) {
+      b.addEventListener('click', function () {
+        curStyle = b.dataset.style;
+        container.querySelectorAll('.jp-ai-chip').forEach(function (x) {
+          const on = x === b;
+          x.classList.toggle('on', on);
+          x.setAttribute('aria-pressed', on);
+        });
+        aiOut.hidden = true;
+        aiOut.textContent = '';
+      });
+    });
+    if (aiGen) aiGen.addEventListener('click', function () {
+      if (!dsKey()) {
+        aiKeyRow.hidden = false;
+        aiKeyIn.focus();
+        return;
+      }
+      aiRun(curStyle, aiOut, aiGen, r, a);
+    });
+    const aiKeySave = container.querySelector('.jp-ai-keysave');
+    if (aiKeySave) aiKeySave.addEventListener('click', function () {
+      const v = (aiKeyIn.value || '').trim();
+      if (!v) { aiKeyIn.focus(); return; }
+      try { localStorage.setItem(KEY_LS, v); } catch (e) { }
+      aiKeyRow.hidden = true;
+      aiKeyIn.value = '';
+      if (aiGen) aiRun(curStyle, aiOut, aiGen, r, a);
+    });
+    const aiCopy2 = container.querySelector('.jp-ai-copy2');
+    if (aiCopy2) aiCopy2.addEventListener('click', function () {
+      const st = AI_STYLES.filter(function (s) { return s.key === curStyle; })[0] || AI_STYLES[0];
+      copyText(aiPrompt(r, a, st)).then(function () {
+        aiCopy2.textContent = '已复制';
+        setTimeout(function () { aiCopy2.textContent = '复制提示词'; }, 1600);
+      }).catch(function () { aiCopy2.textContent = '复制失败'; });
     });
 
     // 趣味AI解读：复制 / 跳转（密钥永不进页面）
