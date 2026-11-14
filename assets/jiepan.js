@@ -846,7 +846,7 @@
     }
     if (y.men) why.push('<li><b>你走的这条路</b>' + y.men + '，' + (DRAMA_MEN[y.men] || '按老路走') + '。</li>');
     if (y.shen) why.push('<li><b>背后那股力</b>' + y.shen + '，' + (DRAMA_SHEN[y.shen] || '看不清') + '。</li>');
-    if (g1) {
+    if (g1 && !(g1.name === '所临八神' && y.shen)) {
       const gn = g1.name === '所临八神' ? (y.shen || g1.name)
         : g1.name === '所临九星' ? (y.tianXing || g1.name)
         : (g1.name === '同宫之门' || g1.name === '用神（门）') ? (y.men || g1.name)
