@@ -512,7 +512,7 @@ body{overflow-x:clip;}
   .control{padding:12px;gap:8px;margin-top:14px;}
   .time-box{flex:1 1 100%;justify-content:flex-start;flex-wrap:wrap;margin-right:0;}
   .time-value{font-size:16px;}
-  .control > .btn{flex:1 1 0;padding:10px 6px;font-size:14.5px;letter-spacing:1px;}
+  .control > .btn{flex:1 1 calc(50% - 5px);padding:10px 6px;font-size:14.5px;letter-spacing:1px;}
 
   .info-card{padding:11px 12px;}
   .pillar{font-size:19px;letter-spacing:2px;gap:5px;}
@@ -788,6 +788,7 @@ body{overflow-x:clip;}
     </div>
     <button class="btn ghost" id="btn-now">用当前时间</button>
     <button class="btn" id="btn-paipan">排盘</button>
+    <button class="btn ghost" id="btn-arch">我的起局<span class="badge" id="arch-count2" hidden>0</span></button>
     <button class="btn save" id="btn-save">存此局</button>
   </section>
 
@@ -2028,10 +2029,12 @@ function saveArchives(list){
   updateArchBadge();
 }
 function updateArchBadge(){
-  const b=document.getElementById('arch-count'); if(!b) return;
   const n=loadArchives().length;
-  b.textContent=n;
-  b.hidden = n===0;          /* 0 时不显示红点，避免无信息噪音 */
+  ;['arch-count','arch-count2'].forEach(function(id){
+    const b=document.getElementById(id); if(!b) return;
+    b.textContent=n;
+    b.hidden = n===0;        /* 0 时不显示红点，避免无信息噪音 */
+  });
 }
 function fmtTs(ts){
   const d=new Date(ts);
@@ -2064,6 +2067,11 @@ function openSaveDialog(afterSave){
   requestAnimationFrame(focusSt); setTimeout(focusSt,150);
 }
 document.getElementById('btn-save').addEventListener('click',()=>openSaveDialog());
+const _archBtn=document.getElementById('btn-arch');
+if(_archBtn) _archBtn.addEventListener('click',()=>{
+  const t=document.querySelector('.tab[data-view="view-archives"]');
+  if(t) t.click();
+});
 document.getElementById('save-cancel').addEventListener('click',()=>{
   document.getElementById('save-mask').classList.remove('open');
   clearFloatingFocus();
